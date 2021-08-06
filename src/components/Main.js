@@ -1,12 +1,23 @@
 import React, { Component } from 'react';
 import Profile from './Profile';
 import ToDoList from './toDoList';
-import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import ToDoListItem from './toDoListItem';
-import {Switch, Route, Redirect} from "react-router-dom";
+import {Switch, Route} from "react-router-dom";
 import ToDoLists from './toDoLists';
 import Users from './Users';
+import Header from './HeaderComponent';
+import AuthComponent from './AuthComponent'
+import SignUpComponent from './SignUpComponent'
+import ProtectedAccess from "./ProtectedAccess";
+import UnprotectedAccess from "./UnprotectedAccess";
+
+const phantom = {
+    display: 'block',
+    padding: '100px',
+    height: '60px',
+    width: '100%',
+}
 
 class Main extends Component {
 
@@ -35,17 +46,44 @@ class Main extends Component {
 
         return (
             <div>
-                <Switch>
-                    <Route exact path ='/todolists' component={ToDoLists}/>
-                    <Route exact path ='/todolists/:listId' component={ToDoList}/>
-                    <Route exact path ='/todolists/:listId/:itemId' component={ToDoListItem}/>
-                    <Route exact path ='/profile' component={Profile}/>
-                    <Route exact path ='/users' component={Users}/>
-                    <Route exact path = '/users/:userId' component={Profile}/>
-                    <Route exact path ='/users/:userId/lists' component={ToDoLists}/>
-                    <Route exact path ='/users/:userId/lists/:listId' component={ToDoList}/>
-                    <Route path ='/users/:userId/lists/:listId/:itemId' component={ToDoListItem}/>
-                </Switch>
+                    <Header/>
+                    <Switch className='content'>
+                        <Route exact path ='/' render={props => <UnprotectedAccess>
+                            <AuthComponent {...props}/>
+                        </UnprotectedAccess>}/>
+                        <Route path = '/signup' render={props => <UnprotectedAccess>
+                            <SignUpComponent {...props}/>
+                        </UnprotectedAccess>}/>
+                        <Route exact path ='/todolists' render={props => <ProtectedAccess>
+                            <ToDoLists {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/todolists/:listId' render={props => <ProtectedAccess>
+                            <ToDoList {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/todolists/:listId/:itemId' render={props => <ProtectedAccess>
+                            <ToDoListItem {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/profile' render={props => <ProtectedAccess>
+                            <Profile {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/users' render={props => <ProtectedAccess>
+                            <Users {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path = '/users/:userId' render={props => <ProtectedAccess>
+                            <Profile {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/users/:userId/lists' render={props => <ProtectedAccess>
+                            <ToDoLists {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route exact path ='/users/:userId/lists/:listId' render={props => <ProtectedAccess>
+                            <ToDoList {...props}/>
+                        </ProtectedAccess>}/>
+                        <Route path ='/users/:userId/lists/:listId/:itemId' render={props => <ProtectedAccess>
+                            <ToDoListItem {...props}/>
+                        </ProtectedAccess>}/>
+                    </Switch>
+                <div style={phantom}/>
+                <Footer/>
             </div>
         );
     }
