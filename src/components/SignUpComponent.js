@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Form, FormGroup, Label, Input, Button} from 'reactstrap';
-import {Link, Redirect} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import {baseURL} from "../config";
 import CryptoAES from "crypto-js/aes";
 
@@ -114,4 +114,4 @@ class SignUp extends Component {
 
 }
 
-export default SignUp;
+export default withRouter(SignUp);

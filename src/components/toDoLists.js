@@ -10,10 +10,18 @@ import {
     ModalBody,
     Form, Label, FormGroup, Input
 } from 'reactstrap';
-import {Link} from 'react-router-dom';
+import {Link, useParams, withRouter} from 'react-router-dom';
 import {baseURL} from "../config";
 
+
 function RenderMenuItem({list}) {
+    let {userId} = useParams()
+    let url;
+    if (userId) {
+        url = baseURL + userId + '/lists/' + list._id
+    } else {
+        url = baseURL + 'todolists/' + list._id
+    }
     function handleSubmit(e) {
         e.preventDefault();
         fetch(baseURL + 'todolists/' + list._id, {
@@ -32,7 +40,7 @@ function RenderMenuItem({list}) {
     }
     return (
         <Card>
-            <Link to={`/todolists/${list._id}`}>
+            <Link to={url}>
                 <CardHeader>{list.name}</CardHeader>
             </Link>
                 <CardBody>
@@ -95,7 +103,8 @@ class ListForm extends Component {
         });
     }
 
-    handleSubmitEdit(values) {
+    handleSubmitEdit(e) {
+        e.preventDefault()
         this.toggleModal();
         fetch(baseURL + 'todolists/' + this.props.list._id, {
             method: 'PUT',
@@ -124,7 +133,8 @@ class ListForm extends Component {
             })
     }
 
-    handleSubmitAdd(values) {
+    handleSubmitAdd(e) {
+        e.preventDefault()
         this.toggleModal();
         fetch(baseURL + 'todolists/', {
                 method: 'POST',
@@ -238,6 +248,8 @@ class ListForm extends Component {
 
 class Lists extends Component {
 
+
+
     constructor(props) {
         super(props);
         this.state = {
@@ -281,7 +293,7 @@ class Lists extends Component {
                     <div className='row'>
                         <div className='col-6'>
                             <br/>
-                            <h2>My Lists</h2>
+                            <h2>{!this.props.match.params.userId ? 'My Lists' : 'Lists of user ' + this.props.match.params.userId}</h2>
                         </div>
                         <div className='col-6 justify-content-center'>
                             <br/>
@@ -300,7 +312,7 @@ class Lists extends Component {
                     <div className='row'>
                         <div className='col-6'>
                             <br/>
-                            <h2>My Lists</h2>
+                            <h2>{!this.props.match.params.userId ? 'My Lists' : 'Lists of user ' + this.props.match.params.userId}</h2>
                         </div>
                         <div className='col-6'>
                             <br/>
@@ -309,7 +321,7 @@ class Lists extends Component {
                         <hr/>
                     </div>
                     <div className="row justify-content-center">
-                        <h2>You have no lists!</h2>
+                        <h2>{!this.props.match.params.userId ? 'You have no lists!' : 'User have no lists!'}</h2>
                     </div>
                 </div>
             );
@@ -317,4 +329,4 @@ class Lists extends Component {
     }
 }
 
-export default Lists;
+export default withRouter(Lists);

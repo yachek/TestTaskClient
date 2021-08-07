@@ -8,6 +8,7 @@ class SignUp extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            password: '',
             email: '',
             oldPassword: '',
             newPassword: '',
@@ -39,7 +40,8 @@ class SignUp extends Component {
                 this.setState({
                     firstName: data.firstName,
                     lastName: data.lastName,
-                    email: data.email
+                    email: data.email,
+                    password: data.password
                 })
             })
     }
@@ -72,8 +74,15 @@ class SignUp extends Component {
     handleSubmitPassword(e) {
         e.preventDefault();
         if (this.state.newPassword === this.state.confirmPassword) {
-            const oldPasswd = CryptoAES.encrypt(this.state.oldPassword, this.state.email).toString();
-            const newPasswd = CryptoAES.encrypt(this.state.newPassword, this.state.email).toString();
+            let oldPasswd, newPasswd;
+            if (!this.props.match.params.userId) {
+                oldPasswd = CryptoAES.encrypt(this.state.oldPassword, this.state.email).toString();
+                newPasswd = CryptoAES.encrypt(this.state.newPassword, this.state.email).toString();
+            } else {
+                oldPasswd = this.state.pass();
+                newPasswd = CryptoAES.encrypt(this.state.newPassword, this.state.email).toString();
+            }
+
             this.setState({oldHashedPassword: oldPasswd,
                                 newHashedPassword: newPasswd}, () => {
                 alert("Current State is: " + JSON.stringify(this.state))
@@ -141,12 +150,13 @@ class SignUp extends Component {
     }
 
     render() {
+        const userId = this.props.match.params.userId
         return (
             <div className='container'>
                 <div className='row'>
                     <div className='col-6 justify-content-center'>
                         <br/>
-                        <h2>My profile</h2>
+                        <h2>{userId ? 'Profile of user '+userId : 'My profile'}</h2>
                     </div>
                     <div className='col-3 justify-content-center'>
                         <br/>
@@ -155,12 +165,12 @@ class SignUp extends Component {
                         </Form>
 
                     </div>
-                    <div className='col-3 justify-content-center'>
+                    {!userId ? <div className='col-3 justify-content-center'>
                         <br/>
                         <Form onSubmit={this.handleSubmitLogOut}>
                             <Button type='submit' className='bg-primary'>LogOut</Button>
                         </Form>
-                    </div>
+                    </div> : <div/>}
                     <hr/>
                 </div>
                 <div className='row justify-content-center'>
@@ -193,13 +203,13 @@ class SignUp extends Component {
                 <div className='row justify-content-center'>
                     <Form className='col-6' onSubmit={this.handleSubmitPassword}>
                         <h2>Change password</h2>
-                        <FormGroup>
+                        {!userId ? <FormGroup>
                             <Label for="oldPassword">Password</Label>
                             <Input type="password" name="oldPassword" id="oldPassword" placeholder="Old password"
                                    value={this.state.oldPassword}
                                    onChange={this.handleInputChange}/>
                             <br/>
-                        </FormGroup>
+                        </FormGroup> : <div/>}
                         <FormGroup>
                             <Label for="newPassword"> New password</Label>
                             <Input type="password" name="newPassword" id="newPassword" placeholder="New password"
