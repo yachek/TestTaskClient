@@ -11,6 +11,7 @@ function Footer(props) {
                         <ul className="list-unstyled">
                             <li><Link className='text-white' to='/todolists'>My Lists</Link></li>
                             <li><Link className='text-white' to='/profile'>Profile</Link></li>
+                            {sessionStorage.getItem('isAdmin') === 'true' ? <li><Link className='text-white' to='/users'>Users</Link></li> : <div/>}
                         </ul>
                     </div>
                 </div>

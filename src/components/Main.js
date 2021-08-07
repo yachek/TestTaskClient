@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Profile from './Profile';
 import ToDoList from './toDoList';
 import Footer from './FooterComponent';
-import ToDoListItem from './toDoListItem';
 import {Switch, Route} from "react-router-dom";
 import ToDoLists from './toDoLists';
 import Users from './Users';
@@ -60,9 +59,6 @@ class Main extends Component {
                         <Route exact path ='/todolists/:listId' render={props => <ProtectedAccess>
                             <ToDoList {...props}/>
                         </ProtectedAccess>}/>
-                        <Route exact path ='/todolists/:listId/:itemId' render={props => <ProtectedAccess>
-                            <ToDoListItem {...props}/>
-                        </ProtectedAccess>}/>
                         <Route exact path ='/profile' render={props => <ProtectedAccess>
                             <Profile {...props}/>
                         </ProtectedAccess>}/>
@@ -77,9 +73,6 @@ class Main extends Component {
                         </ProtectedAccess>}/>
                         <Route exact path ='/users/:userId/lists/:listId' render={props => <ProtectedAccess>
                             <ToDoList {...props}/>
-                        </ProtectedAccess>}/>
-                        <Route path ='/users/:userId/lists/:listId/:itemId' render={props => <ProtectedAccess>
-                            <ToDoListItem {...props}/>
                         </ProtectedAccess>}/>
                     </Switch>
                 <div style={phantom}/>

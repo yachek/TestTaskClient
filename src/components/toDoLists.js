@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
     Card,
-    CardTitle,
     Modal,
     CardText,
     CardHeader,
@@ -9,14 +8,28 @@ import {
     Button,
     ModalHeader,
     ModalBody,
-    Form,
-    Row,
-    Col, Label, FormGroup, Input
+    Form, Label, FormGroup, Input
 } from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {baseURL} from "../config";
 
 function RenderMenuItem({list}) {
+    function handleSubmit(e) {
+        e.preventDefault();
+        fetch(baseURL + 'todolists/' + list._id, {
+            method: 'DELETE',
+            headers: {
+                email: sessionStorage.getItem('email'),
+                password: sessionStorage.getItem('password')
+            }
+        })
+            .then(resp => {
+                if (resp.ok) {
+                    alert('Deleted successfully!')
+                    window.location.reload()
+                }
+            })
+    }
     return (
         <Card>
             <Link to={`/todolists/${list._id}`}>
@@ -24,10 +37,11 @@ function RenderMenuItem({list}) {
             </Link>
                 <CardBody>
                     <CardText>{list.description}</CardText>
-                    <Button color='primary'>Delete</Button>
-                    <Button color='primary'>Edit</Button>
+                    <form onSubmit={handleSubmit}>
+                        <Button color='primary' type='submit'>Delete</Button>
+                    </form>
+                    <ListForm list={list}/>
                 </CardBody>
-                <ListForm list={list}/>
         </Card>
     );
 }
@@ -38,52 +52,186 @@ class ListForm extends Component {
         super(props);
 
         this.toggleModal = this.toggleModal.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmitEdit = this.handleSubmitEdit.bind(this);
+        this.handleSubmitAdd = this.handleSubmitAdd.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
 
         this.state = {
-            isNavOpen: false,
-            isModalOpen: false
+            isModalOpen: false,
+            name: '',
+            description: '',
+            expiresAt: null
         };
     }
 
     toggleModal() {
         this.setState({
-            isModalOpen: !this.state.isModalOpen
+            isModalOpen: !this.state.isModalOpen,
+            name: '',
+            description: '',
+            expiresAt: null
+        }, () => {
+            if (this.props.list && this.state.isModalOpen) {
+                fetch(baseURL + 'todolists/' + this.props.list._id, {
+                    method: 'GET',
+                    headers: {
+                        email: sessionStorage.getItem('email'),
+                        password: sessionStorage.getItem('password')
+                    }
+                })
+                    .then(resp => {
+                        if (resp.ok) {
+                            return resp.json();
+                        }
+                    })
+                    .then(data => {
+                        this.setState({
+                            name: data.name,
+                            description: data.description,
+                            expiresAt: data.expiresAt
+                        })
+                    })
+            }
         });
     }
 
-    handleSubmit(values) {
+    handleSubmitEdit(values) {
         this.toggleModal();
-        this.props.postComment(this.props.dishId, values.rating, values.comment);
+        fetch(baseURL + 'todolists/' + this.props.list._id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                email: sessionStorage.getItem('email'),
+                password: sessionStorage.getItem('password')
+            },
+            body: JSON.stringify({
+                name: this.state.name,
+                description: this.state.description,
+                expiresAt: this.state.expiresAt
+            })
+        })
+            .then(resp => {
+                if (resp.ok) {
+                    return resp.json();
+                }
+            })
+            .then(data => {
+                this.setState({
+                    name: data.name,
+                    description: data.description,
+                    expiresAt: data.expiresAt
+                })
+            })
+    }
+
+    handleSubmitAdd(values) {
+        this.toggleModal();
+        fetch(baseURL + 'todolists/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    email: sessionStorage.getItem('email'),
+                    password: sessionStorage.getItem('password')
+                },
+                body: JSON.stringify(this.state)
+            }
+        )
+            .then(resp => {
+                if (resp.ok) {
+                    return resp.json();
+                }
+            })
+            .then(data => {
+                alert('Successfully added!')
+                window.location.reload()
+            })
+            .catch((err) => {
+                alert(err.toString())
+            })
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
     }
 
     render() {
-        return(
-            <div>
-                <Button color='primary' onClick={this.toggleModal}>Add new To Do List</Button>
-                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
-                    <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
-                    <ModalBody>
-                        <Form onSubmit={(values) => this.handleSubmit(values)}>
-                            <FormGroup>
-                                <Label for="email">Email</Label>
-                                <Input type="email" name="email" id="email" placeholder="Email"
-                                       value={this.state.email}
-                                       onChange={this.handleInputChange}/>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="password">Password</Label>
-                                <Input type="password" name="password" id="password" placeholder="Password"
-                                       value={this.state.password}
-                                       onChange={this.handleInputChange}/>
-                            </FormGroup>
-                            <Link to='/signup'>Sign up</Link>
-                            <Button type='submit' value="submit" color='primary'>Submit</Button>
-                        </Form>
-                    </ModalBody>
-                </Modal>
-            </div>
-        );
+        if (this.props.list) {
+            return(
+                <div>
+                    <Button color='primary' onClick={this.toggleModal}>Edit</Button>
+                    <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                        <ModalHeader toggle={this.toggleModal}>Edit To Do List</ModalHeader>
+                        <ModalBody>
+                            <Form onSubmit={(values) => this.handleSubmitEdit(values)}>
+                                <FormGroup>
+                                    <Label for="name">Name</Label>
+                                    <Input type="text" name="name" id="name" placeholder="Name"
+                                           value={this.state.name}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="description">Description</Label>
+                                    <Input name="description" id="description" placeholder="Description"
+                                           value={this.state.description}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="expiresAt">Expires date</Label>
+                                    <Input type='datetime-local' name="expiresAt" id="expiresAt" placeholder="Expires At"
+                                           value={this.state.expiresAt}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <Button type='submit' value="submit" color='primary'>Edit</Button>
+                            </Form>
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        } else {
+            return(
+                <div>
+                    <Button color='primary' onClick={this.toggleModal}>Add new To Do List</Button>
+                    <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                        <ModalHeader toggle={this.toggleModal}>Add new To Do List</ModalHeader>
+                        <ModalBody>
+                            <Form onSubmit={(values) => this.handleSubmitAdd(values)}>
+                                <FormGroup>
+                                    <Label for="name">Name</Label>
+                                    <Input type="text" name="name" id="name" placeholder="Name"
+                                           value={this.state.name}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="description">Description</Label>
+                                    <Input type='text' name="description" id="description" placeholder="Description"
+                                           value={this.state.description}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="expiresAt">Expires date</Label>
+                                    <Input type='datetime-local' name="expiresAt" id="expiresAt" placeholder="Expires At"
+                                           value={this.state.expiresAt}
+                                           onChange={this.handleInputChange}/>
+                                    <br/>
+                                </FormGroup>
+                                <Button type='submit' value="submit" color='primary'>Add</Button>
+                            </Form>
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        }
     }
 
 }
@@ -131,12 +279,15 @@ class Lists extends Component {
             return (
                 <div className="container">
                     <div className='row'>
-                        <div className='col-12'>
+                        <div className='col-6'>
                             <br/>
                             <h2>My Lists</h2>
-                            <ListForm/>
-                            <hr/>
                         </div>
+                        <div className='col-6 justify-content-center'>
+                            <br/>
+                            <ListForm/>
+                        </div>
+                        <hr/>
                     </div>
                     <div className="row">
                         {lists}
@@ -153,7 +304,7 @@ class Lists extends Component {
                         </div>
                         <div className='col-6'>
                             <br/>
-                            <Button color='primary'>Add new list</Button>
+                            <ListForm/>
                         </div>
                         <hr/>
                     </div>

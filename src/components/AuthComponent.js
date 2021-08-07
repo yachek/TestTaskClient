@@ -40,9 +40,7 @@ class Auth extends Component {
             })
                 .then(response => {
                         if (response.ok) {
-                            sessionStorage.setItem('email', this.state.email);
-                            sessionStorage.setItem('password', this.state.hashedPassword)
-                            this.props.history.push('/todolists');
+                            return response.json()
                         }
                         else {
                             const error = new Error('Error ' + response.status + ': ' + response.statusText);
@@ -53,6 +51,12 @@ class Auth extends Component {
                     error => {
                         throw new Error(error.message);
                     })
+                .then(data => {
+                    sessionStorage.setItem('email', data.email);
+                    sessionStorage.setItem('password', data.password)
+                    sessionStorage.setItem('isAdmin', data.isAdmin)
+                    window.location.reload()
+                })
         })
 
     }

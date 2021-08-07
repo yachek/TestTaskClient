@@ -49,7 +49,8 @@ class SignUp extends Component {
                     alert('RESPONSE DATA')
                     sessionStorage.setItem('email', this.state.email);
                     sessionStorage.setItem('password', this.state.hashedPassword)
-                    this.props.history.push('/todolists');
+                    sessionStorage.setItem('isAdmin', data.isAdmin)
+                    window.location.reload()
                 })
         })
     }

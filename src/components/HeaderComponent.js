@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Navbar, Nav, Container, NavbarBrand, NavLink, NavbarToggler, NavItem, Collapse} from 'reactstrap';
+import {Navbar, Nav, NavbarBrand, NavLink, NavItem} from 'reactstrap';
 
 class Header extends Component {
 
@@ -19,15 +19,18 @@ class Header extends Component {
         return (
             <div>
                 <Navbar color="primary" dark expand="md">
-                    <NavbarBrand href='/todolists'>To DO LIST</NavbarBrand>
-                        <Nav className="mr-auto" navbar>
+                    <NavbarBrand href='/todolists'>To DO LISTS</NavbarBrand>
+                        {sessionStorage.getItem('email') ? <Nav className="mr-auto" navbar>
                             <NavItem>
                                 <NavLink href="/todolists">My Lists</NavLink>
                             </NavItem>
                             <NavItem>
                                 <NavLink href="/profile">Profile</NavLink>
                             </NavItem>
-                        </Nav>
+                            {sessionStorage.getItem('isAdmin') === 'true' ? <NavItem>
+                                <NavLink href="/users">Users</NavLink>
+                            </NavItem> : <div/>}
+                        </Nav> : <div/>}
                 </Navbar>
             </div>
         )

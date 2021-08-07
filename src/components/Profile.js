@@ -105,6 +105,30 @@ class SignUp extends Component {
         }
     }
 
+    handleSubmitDelete(e) {
+        e.preventDefault();
+
+        fetch(baseURL + 'profile', {
+            method: 'DELETE',
+            headers: {
+                email: sessionStorage.getItem('email'),
+                password: sessionStorage.getItem('password')
+            }
+        })
+            .then(r  => {
+                if (r.ok) {
+                    sessionStorage.clear();
+                    window.location.reload();
+                }
+            })
+    }
+
+    handleSubmitLogOut(e) {
+        e.preventDefault();
+        sessionStorage.clear();
+        window.location.reload();
+    }
+
     handleInputChange(event) {
         const target = event.target;
         const value = target.value;
@@ -120,11 +144,24 @@ class SignUp extends Component {
         return (
             <div className='container'>
                 <div className='row'>
-                    <div className='col-12'>
+                    <div className='col-6 justify-content-center'>
                         <br/>
                         <h2>My profile</h2>
-                        <hr/>
                     </div>
+                    <div className='col-3 justify-content-center'>
+                        <br/>
+                        <Form onSubmit={this.handleSubmitDelete}>
+                            <Button type='submit' className='bg-danger'>Delete</Button>
+                        </Form>
+
+                    </div>
+                    <div className='col-3 justify-content-center'>
+                        <br/>
+                        <Form onSubmit={this.handleSubmitLogOut}>
+                            <Button type='submit' className='bg-primary'>LogOut</Button>
+                        </Form>
+                    </div>
+                    <hr/>
                 </div>
                 <div className='row justify-content-center'>
                     <Form className='col-6' onSubmit={this.handleSubmitName}>
