@@ -70,11 +70,11 @@ class UsersForm extends Component {
     render() {
         return(
             <div>
-                <Button color='primary' onClick={this.toggleModal}>Add new To Do List</Button>
+                <Button color='primary' onClick={this.toggleModal}>Add new User</Button>
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalHeader toggle={this.toggleModal}>Add new User</ModalHeader>
                     <ModalBody>
-                        <SignUpComponent/>
+                        <SignUpComponent users={true}/>
                     </ModalBody>
                 </Modal>
             </div>

@@ -37,7 +37,7 @@ function RenderMenuItem({item, listId}) {
                 {item.time ? <CardTitle>Time: {item.time}</CardTitle> : <div/>}
                 <CardText>{item.description}</CardText>
                 <form onSubmit={handleSubmit}>
-                    <Button color='primary' type='submit'>Delete</Button>
+                    <Button className='bg-danger' type='submit'>Delete</Button>
                 </form>
                 <ListForm item={item} listId={listId}/>
             </CardBody>
@@ -443,7 +443,7 @@ class List extends Component {
                         <hr/>
                     </div>
                     <div className="row justify-content-center">
-                        <h2>You have no items in list!</h2>
+                        <h2>{this.props.match.params.userId ? 'User haven`t items in list!' : 'You have no items in list!'}</h2>
                     </div>
                 </div>
             );

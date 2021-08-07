@@ -18,9 +18,9 @@ function RenderMenuItem({list}) {
     let {userId} = useParams()
     let url;
     if (userId) {
-        url = baseURL + userId + '/lists/' + list._id
+        url = 'lists/' + list._id
     } else {
-        url = baseURL + 'todolists/' + list._id
+        url = 'todolists/' + list._id
     }
     function handleSubmit(e) {
         e.preventDefault();
@@ -46,7 +46,7 @@ function RenderMenuItem({list}) {
                 <CardBody>
                     <CardText>{list.description}</CardText>
                     <form onSubmit={handleSubmit}>
-                        <Button color='primary' type='submit'>Delete</Button>
+                        <Button className='bg-danger' type='submit'>Delete</Button>
                     </form>
                     <ListForm list={list}/>
                 </CardBody>
@@ -129,6 +129,8 @@ class ListForm extends Component {
                     name: data.name,
                     description: data.description,
                     expiresAt: data.expiresAt
+                }, () => {
+                    window.location.reload()
                 })
             })
     }
@@ -136,7 +138,13 @@ class ListForm extends Component {
     handleSubmitAdd(e) {
         e.preventDefault()
         this.toggleModal();
-        fetch(baseURL + 'todolists/', {
+        let url;
+        if (this.props.userId) {
+            url = baseURL + 'users/' + this.props.userId + '/lists'
+        } else {
+            url = baseURL + 'todolists/'
+        }
+        fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -200,7 +208,7 @@ class ListForm extends Component {
                                            onChange={this.handleInputChange}/>
                                     <br/>
                                 </FormGroup>
-                                <Button type='submit' value="submit" color='primary'>Edit</Button>
+                                <Button type='submit' value="submit" className='bg-primary'>Edit</Button>
                             </Form>
                         </ModalBody>
                     </Modal>
@@ -258,7 +266,13 @@ class Lists extends Component {
     }
 
     componentDidMount() {
-        fetch(baseURL + 'todolists', {
+        let url;
+        if (this.props.match.params.userId) {
+            url = baseURL + 'users/' + this.props.match.params.userId + '/lists'
+        } else {
+            url = baseURL + 'todolists'
+        }
+        fetch(url, {
             method: 'GET',
             headers: {
                 email: sessionStorage.getItem('email'),
@@ -297,7 +311,7 @@ class Lists extends Component {
                         </div>
                         <div className='col-6 justify-content-center'>
                             <br/>
-                            <ListForm/>
+                            <ListForm userId={this.props.match.params.userId}/>
                         </div>
                         <hr/>
                     </div>
@@ -316,7 +330,7 @@ class Lists extends Component {
                         </div>
                         <div className='col-6'>
                             <br/>
-                            <ListForm/>
+                            <ListForm userId={this.props.match.params.userId}/>
                         </div>
                         <hr/>
                     </div>

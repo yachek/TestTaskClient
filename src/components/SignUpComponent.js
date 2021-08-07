@@ -47,9 +47,11 @@ class SignUp extends Component {
                 })
                 .then(data => {
                     alert('RESPONSE DATA')
-                    sessionStorage.setItem('email', this.state.email);
-                    sessionStorage.setItem('password', this.state.hashedPassword)
-                    sessionStorage.setItem('isAdmin', data.isAdmin)
+                    if (!this.props.match.params.userId) {
+                        sessionStorage.setItem('email', this.state.email);
+                        sessionStorage.setItem('password', this.state.hashedPassword)
+                        sessionStorage.setItem('isAdmin', data.isAdmin)
+                    }
                     window.location.reload()
                 })
         })
@@ -103,7 +105,7 @@ class SignUp extends Component {
                                    value={this.state.lastName}
                                    onChange={this.handleInputChange}/>
                         </FormGroup>
-                        <Link to='/'>Sign in</Link>
+                        {!this.props.users ? <Link to='/'>Sign in</Link> : <div/>}
                         <Button type='submit' value="submit" color='primary'>Submit</Button>
                     </Form>
                 </div>
