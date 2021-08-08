@@ -88,7 +88,7 @@ class ListForm extends Component {
                         this.setState({
                             name: data.name,
                             description: data.description,
-                            expiresAt: data.expiresAt
+                            expiresAt: data.expiresAt.substring(0, data.expiresAt.length - 1)
                         })
                     })
             } else if (this.state.isModalOpen && this.props.item) {

@@ -45,6 +45,7 @@ function RenderMenuItem({list}) {
             </Link>
                 <CardBody>
                     <CardText>{list.description}</CardText>
+                    {list.expiresAt ? <CardText>Expires at: {list.expiresAt}</CardText> : <div/>}
                     <form onSubmit={handleSubmit}>
                         <Button className='bg-danger' type='submit'>Delete</Button>
                     </form>
@@ -96,7 +97,9 @@ class ListForm extends Component {
                         this.setState({
                             name: data.name,
                             description: data.description,
-                            expiresAt: data.expiresAt
+                            expiresAt: data.expiresAt.substring(0, data.expiresAt.length - 1)
+                        }, () => {
+                            console.dir(this.state)
                         })
                     })
             }
@@ -128,7 +131,7 @@ class ListForm extends Component {
                 this.setState({
                     name: data.name,
                     description: data.description,
-                    expiresAt: data.expiresAt
+                    expiresAt: data.expiresAt.substring(0, data.expiresAt.length - 1)
                 }, () => {
                     window.location.reload()
                 })
